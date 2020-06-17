@@ -8,6 +8,7 @@ class SoundPlayer {
     private final SoundPool soundPool;
     private final int soundConnected;
     private final int soundDisconnected;
+    private final int sound;
 
     SoundPlayer(Context context) {
         AudioAttributes attrs = new AudioAttributes.Builder()
@@ -24,6 +25,7 @@ class SoundPlayer {
         soundConnected = soundPool.load(context, R.raw.nhk_doorbell, 1);
         // https://www2.nhk.or.jp/archives/creative/material/view.cgi?m=D0002070102_00000
         soundDisconnected = soundPool.load(context, R.raw.nhk_woodblock2, 1);
+        sound = soundPool.load(context, R.raw.get_war_declare, 1);
     }
 
     void playConnected() {
@@ -32,5 +34,9 @@ class SoundPlayer {
 
     void playDisconnected() {
         soundPool.play(soundDisconnected, 1.0f, 1.0f, 0, 0, 1);
+    }
+
+    void playSound() {
+        soundPool.play(sound, 1.0f, 1.0f, 0, 0, 1);
     }
 }

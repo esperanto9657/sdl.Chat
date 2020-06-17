@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView logview;
     private EditText input;
     private Button button;
+    private Button soundbutton;
 
     private final ArrayList<ChatMessage> chatLog = new ArrayList<>();
     private ArrayAdapter<ChatMessage> chatLogAdapter;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int messageSeq = 0;
     private Agent agent;
-    private SoundPlayer soundPlayer;
+    private static SoundPlayer soundPlayer;
     private BluetoothInitializer initializer;
 
     @Override
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         progress = findViewById(R.id.main_progress);
         input = findViewById(R.id.main_input);
         button = findViewById(R.id.main_button);
+        soundbutton = findViewById(R.id.sound_button);
 
         chatLogAdapter = new ArrayAdapter<ChatMessage>(this, 0, chatLog) {
             @Override
@@ -146,7 +148,13 @@ public class MainActivity extends AppCompatActivity {
                     activity.setState(State.Disconnected);
                     break;
                 case Agent.MSG_RECEIVED:
-                    activity.showMessage((ChatMessage) msg.obj);
+                    ChatMessage chatmessage = (ChatMessage) msg.obj;
+                    if(chatmessage.sound == 0) {
+                        activity.showMessage(chatmessage);
+                    }
+                    else {
+                        soundPlayer.playSound();
+                    }
                     break;
             }
         }
@@ -238,6 +246,15 @@ public class MainActivity extends AppCompatActivity {
         input.getEditableText().clear();
     }
 
+    public void onClickSoundButton(View v) {
+        Log.d(TAG, "onClickSoundButton");
+
+        long time = System.currentTimeMillis();
+        String content = " ";
+        ChatMessage message = new ChatMessage(messageSeq, time, content, adapter.getName(), 1);
+        agent.send(message);
+    }
+
     public void setState(State state) {
         setState(state, null);
     }
@@ -246,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
         this.state = state;
         input.setEnabled(state == State.Connected);
         button.setEnabled(state == State.Connected);
+        soundbutton.setEnabled(state == State.Connected);
         switch (state) {
         case Initializing:
         case Disconnected:
